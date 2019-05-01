@@ -7,17 +7,17 @@ in vec2 texcoord;
 
 // matrices
 uniform mat4 model_matrix;
-uniform mat4 view_matrix;
-uniform mat4 projection_matrix;
+uniform mat4 view_projection_matrix;
+uniform float aspect_ratio;
 
+out vec2 tc;
 out vec3 norm;
+out uint color_mode_f;
 
-void main()
-{
-	vec4 wpos = model_matrix * vec4(position,1);
-	vec4 epos = view_matrix * wpos;
-	gl_Position = projection_matrix * epos;
+void main() {
+    gl_Position = view_projection_matrix * model_matrix * vec4(position, 1);
+    gl_Position.xy *= aspect_ratio > 1 ? vec2(1 / aspect_ratio, 1) : vec2(1, aspect_ratio);
 
-	// pass eye-coordinate normal to fragment shader
-	norm = normalize(mat3(view_matrix*model_matrix)*normal);
+    tc = texcoord;
+    norm = normalize(mat3(view_projection_matrix)*normal);
 }
