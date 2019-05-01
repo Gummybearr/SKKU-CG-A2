@@ -132,7 +132,7 @@ void InitializeVertexAndIndex() {
     // Create vertices
     VertexList.clear();
     for(uint theta_k = 0; theta_k <= LatitudeVertexNumber; theta_k++) {
-        for(uint pi_k = 0; pi_k < LongitudeVertexNumber; pi_k++) {
+        for(uint pi_k = 0; pi_k <= LongitudeVertexNumber; pi_k++) {
             float theta = (PI / float(LatitudeVertexNumber)) * float(theta_k);
             float pi = (2.0f * PI / float(LongitudeVertexNumber)) * float(pi_k);
 
@@ -143,8 +143,6 @@ void InitializeVertexAndIndex() {
             VertexList.push_back({vec3(Radius * x_norm, Radius * y_norm, Radius * z_norm),
                                   vec3(x_norm, y_norm, z_norm),
                                   vec2(pi / (2.0f * PI), 1 - theta / PI)});
-
-            if(theta_k == 0 || theta_k == LatitudeVertexNumber) break;
         }
     }
 
@@ -152,22 +150,15 @@ void InitializeVertexAndIndex() {
     IndexList.clear();
     for(uint theta_k = 0; theta_k <= LatitudeVertexNumber; theta_k++) {
         for(uint pi_k = 0; pi_k < LongitudeVertexNumber; pi_k++) {
-            if(theta_k == 0) {
-                IndexList.push_back(0);
-                IndexList.push_back(pi_k + 1);
-                IndexList.push_back((pi_k + 1) % LongitudeVertexNumber + 1);
-            } else if(theta_k == LatitudeVertexNumber - 1) {
-                IndexList.push_back((theta_k - 1) * LongitudeVertexNumber + (pi_k + 1) % LongitudeVertexNumber + 1);
-                IndexList.push_back((theta_k - 1) * LongitudeVertexNumber + pi_k + 1);
-                IndexList.push_back(theta_k * LongitudeVertexNumber + 1);
-            } else {
-                IndexList.push_back((theta_k - 1) * LongitudeVertexNumber + (pi_k + 1) % LongitudeVertexNumber + 1);
-                IndexList.push_back((theta_k - 1) * LongitudeVertexNumber + pi_k + 1);
-                IndexList.push_back(theta_k * LongitudeVertexNumber + (pi_k + 1) % LongitudeVertexNumber + 1);
-
-                IndexList.push_back(theta_k * LongitudeVertexNumber + pi_k + 1);
-                IndexList.push_back(theta_k * LongitudeVertexNumber + (pi_k + 1) % LongitudeVertexNumber + 1);
-                IndexList.push_back((theta_k - 1) * LongitudeVertexNumber + pi_k + 1);
+            if(theta_k > 0) {
+                IndexList.push_back((theta_k - 1) * (LongitudeVertexNumber + 1) + pi_k + 1);
+                IndexList.push_back((theta_k - 1) * (LongitudeVertexNumber + 1) + pi_k);
+                IndexList.push_back(theta_k * (LongitudeVertexNumber + 1) + pi_k + 1);
+            }
+            if(theta_k < LatitudeVertexNumber) {
+                IndexList.push_back(theta_k * (LongitudeVertexNumber + 1) + pi_k);
+                IndexList.push_back(theta_k * (LongitudeVertexNumber + 1) + pi_k + 1);
+                IndexList.push_back((theta_k - 1) * (LongitudeVertexNumber + 1) + pi_k);
             }
         }
     }
